@@ -7,6 +7,12 @@
 -export([handle/2]).
 
 handle(createJournalItemCommand, C=#createJournalItemCommand{}) -> 
-	commandHandler:add(journalItemAggregate, C#createJournalItemCommand.journalItem, C);
+	commandHandler:add(journalItemAggregate, 
+					   C#createJournalItemCommand.journalItem, 
+					   createJournalItemCommand,
+					   C);
 handle(deleteJournalItemCommand, C=#deleteJournalItemCommand{}) -> 
-	commandHandler:single(journalItemAggregate, C#deleteJournalItemCommand.journalItem, C).
+	commandHandler:single(journalItemAggregate, 
+						  C#deleteJournalItemCommand.journalItem, 
+						  deleteJournalItemCommand,
+						  C).

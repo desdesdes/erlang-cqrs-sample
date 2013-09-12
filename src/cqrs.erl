@@ -4,7 +4,10 @@
 -compile(export_all).
 
 start() ->
+	commandBus:start_link(),
+	commandBus:registerHandler(createJournalItemCommand, journalItemCommandHandler),
+	commandBus:registerHandler(deleteJournalItemCommand, journalItemCommandHandler),
 	ok.
 
-dispatch(command, commandData) ->
-	ok.
+dispatch(Command, CommandData) ->
+	commandBus:dispatch(Command, CommandData).

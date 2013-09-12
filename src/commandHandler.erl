@@ -8,21 +8,23 @@ behaviour_info(_) -> undefined.
 
 
 add(Aggregate, _Id, Command, CommandData) ->
-	Events = Aggregate:do(Command, CommandData, undefined),
+	StartState = Aggregate:init(),
+	Events = Aggregate:do(Command, CommandData, StartState),
 
 	% apply the events to the aggregate
-	_NewState = applyEvent(Aggregate, Events, undefined),
+	_NewState = applyEvent(Aggregate, Events, StartState),
 	% store the new event
 	% push the event to the rest of the system
 	% new state could be stored to improve load performance
 	ok.
 
 single(Aggregate, _Id, Command, CommandData) -> 
-	% load all the events for the aggregate id and apply all of them
-	% OldState = applyEvent(Aggregate, Events, undefined),
-	OldState = undefined,
+	StartState = Aggregate:init(),
 
-	Events = Aggregate:do(Command, CommandData, OldState),
+	% load all the events for the aggregate id and apply all of them
+	% LastGoodState = applyEvent(Aggregate, Events, undefined),
+
+	Events = Aggregate:do(Command, CommandData, StartState),
 
 	% apply the events to the aggregate
 	_NewState = applyEvent(Aggregate, Events, undefined),
