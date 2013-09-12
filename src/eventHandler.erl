@@ -1,4 +1,4 @@
--module(queryModelBuilder).
+-module(eventHandler).
 
 -export([behaviour_info/1]).
  

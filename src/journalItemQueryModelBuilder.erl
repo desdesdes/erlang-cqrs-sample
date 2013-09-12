@@ -3,7 +3,7 @@
 -include("queryModelObjects.hrl").
 -include("events.hrl").
 
--behaviour(queryModelBuilder).
+-behaviour(eventHandler).
 
 -export([handle/2]).
 
