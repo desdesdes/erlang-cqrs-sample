@@ -23,11 +23,10 @@ init([]) ->
 	{ok, orddict:new()}. % init state
 
 handle_call({register, Command, CommandHandler}, _From, State) ->
-	NewState = orddict:store(Command,CommandHandler,State),
+	NewState = addDestination(State, Command,CommandHandler),
 	{reply, ok, NewState};
 handle_call({dispatch, Command, CommandData}, _From, State) ->
-    {ok, CommandHandler} = orddict:find(Command, State),
-    CommandHandler:handle(Command, CommandData),
+	callDestination(State, Command, CommandData),
     {reply, ok, State};
 handle_call(Msg, _From, State) ->
 	io:format("Unexpected message: ~p~n",[Msg]),
@@ -49,3 +48,11 @@ code_change(_OldVsn, State, _Extra) ->
 	%% but will not be used. Only a version on the next
 	{ok, State}.
 
+addDestination(CurrentDestinations, Command, CommandHandler) -> 
+	% destinations should only exist once
+	orddict:store(Command,CommandHandler,CurrentDestinations).
+
+callDestination(CurrentDestinations, Command, CommandData) -> 
+	% destinations should always exist
+	{ok, CommandHandler} = orddict:find(Command, CurrentDestinations),
+    CommandHandler:handle(Command, CommandData).

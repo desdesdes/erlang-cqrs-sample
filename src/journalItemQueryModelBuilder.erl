@@ -7,9 +7,11 @@
 
 -export([handle/2]).
 
-handle(journalItemCreatedEvent, _E=#journalItemCreatedEvent{}) -> 
+handle(journalItemCreatedEvent, E=#journalItemCreatedEvent{}) -> 
+	io:format("journalItemQueryModelBuilder journalItemCreatedEvent: ~p~n",[E]),
 	% write to db
 	ok;
-handle(journalItemDeletedEvent, _E=#journalItemDeletedEvent{}) -> 
+handle(journalItemDeletedEvent, E=#journalItemDeletedEvent{}) -> 
+	io:format("journalItemQueryModelBuilder journalItemDeletedEvent: ~p~n",[E]),
 	% remove from DB
 	ok.
