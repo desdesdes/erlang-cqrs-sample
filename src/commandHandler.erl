@@ -1,6 +1,6 @@
 -module(commandHandler).
 
--export([behaviour_info/1, add/4, single/4]).
+-export([behaviour_info/1, add/4, update/4]).
  
 %% init/1, some_fun/0 and other/3 are now expected callbacks
 behaviour_info(callbacks) -> [{handle, 2}];
@@ -15,12 +15,12 @@ add(Aggregate, Id, Command, CommandData) ->
 	% new state could be stored to improve load performance
 
 	% store the new events
-	eventstore:storeNew(Id, Events),
+	eventstore:storeAddToNew(Id, Events),
 
 	% push the event to the rest of the system
 	publishEvents(Events).
 
-single(Aggregate, Id, Command, CommandData) -> 
+update(Aggregate, Id, Command, CommandData) -> 
 	StartState = Aggregate:init(),
 
 	RetrievedEvents = eventstore:retrieve(Id),
@@ -35,7 +35,7 @@ single(Aggregate, Id, Command, CommandData) ->
 	% new state could be stored to improve load performance
 
 	% store the new events
-	eventstore:storeAdd(Id, Events),
+	eventstore:storeAddToExisting(Id, Events),
 
 	% push the event to the rest of the system
 	publishEvents(Events).

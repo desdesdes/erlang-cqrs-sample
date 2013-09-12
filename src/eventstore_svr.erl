@@ -2,7 +2,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/0, storeNew/2, storeAdd/2, retrieve/1]).
+-export([start_link/0, storeAddToNew/2, storeAddToExisting/2, retrieve/1]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
@@ -12,11 +12,11 @@ start_link() ->
 	{_,Pid} = gen_server:start_link(?MODULE, [], []),
 	register(?MODULE, Pid).
 
-storeNew(Id, Events) ->
-	gen_server:call(?MODULE, {storeNew, Id, Events}).
+storeAddToNew(Id, Events) ->
+	gen_server:call(?MODULE, {storeAddToNew, Id, Events}).
 
-storeAdd(Id, Events) ->
-	gen_server:call(?MODULE, {storeAdd, Id, Events}).
+storeAddToExisting(Id, Events) ->
+	gen_server:call(?MODULE, {storeAddToExisting, Id, Events}).
 
 retrieve(Id) ->
 	gen_server:call(?MODULE, {retrieve, Id}).
@@ -25,10 +25,10 @@ retrieve(Id) ->
 init([]) -> 	
 	{ok, orddict:new()}. % init state
 
-handle_call({storeAdd, Id, Events}, _From, State) ->
+handle_call({storeAddToExisting, Id, Events}, _From, State) ->
 	NewState = addEventsToExisting(Id, Events, State),
 	{reply, ok, NewState};
-handle_call({storeNew, Id, Events}, _From, State) ->
+handle_call({storeAddToNew, Id, Events}, _From, State) ->
 	NewState = addEventsToNew(Id, Events, State),
 	{reply, ok, NewState};
 handle_call( {retrieve, Id}, _From, State) ->

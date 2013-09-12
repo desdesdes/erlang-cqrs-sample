@@ -12,7 +12,7 @@ handle(createJournalItemCommand, C=#createJournalItemCommand{}) ->
 					   createJournalItemCommand,
 					   C);
 handle(deleteJournalItemCommand, C=#deleteJournalItemCommand{}) -> 
-	commandHandler:single(journalItemAggregate, 
+	commandHandler:update(journalItemAggregate, 
 						  C#deleteJournalItemCommand.journalItem, 
 						  deleteJournalItemCommand,
 						  C).

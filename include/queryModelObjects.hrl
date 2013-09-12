@@ -1,5 +1,5 @@
 %% this is a .hrl (header) file.
--record(dossieritemDetailsQmo, {journalItem,
+-record(journalItemQmo, {journalItem,
 				                   name,
 				                   description,
 				                   salesrelation,
