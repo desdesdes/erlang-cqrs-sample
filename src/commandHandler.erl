@@ -15,7 +15,7 @@ add(Aggregate, Id, Command, CommandData) ->
 	% new state could be stored to improve load performance
 
 	% store the new events
-	eventstore:store(Id, Events),
+	eventstore:storeNew(Id, Events),
 
 	% push the event to the rest of the system
 	publishEvents(Events).
@@ -35,7 +35,7 @@ single(Aggregate, Id, Command, CommandData) ->
 	% new state could be stored to improve load performance
 
 	% store the new events
-	eventstore:store(Id, Events),
+	eventstore:storeAdd(Id, Events),
 
 	% push the event to the rest of the system
 	publishEvents(Events).

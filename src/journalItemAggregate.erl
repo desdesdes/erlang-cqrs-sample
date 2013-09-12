@@ -12,7 +12,6 @@
 init() -> #state{}.
 
 do(createJournalItemCommand, C=#createJournalItemCommand{}, _State=#state{}) ->
-	io:format("do: ~p~n",[C]),
 	E = #journalItemCreatedEvent{
 			journalItem=C#createJournalItemCommand.journalItem,
 			name=C#createJournalItemCommand.name,
@@ -27,7 +26,6 @@ do(createJournalItemCommand, C=#createJournalItemCommand{}, _State=#state{}) ->
 	    false -> [{journalItemCreatedEvent, E}]
 	end;
 do(deleteJournalItemCommand, C=#deleteJournalItemCommand{}, State=#state{}) ->
-	io:format("do: ~p~n",[C]),
 	E = #journalItemDeletedEvent{
 			journalItem=C#deleteJournalItemCommand.journalItem},
 
@@ -37,7 +35,7 @@ do(deleteJournalItemCommand, C=#deleteJournalItemCommand{}, State=#state{}) ->
 	    false -> [{journalItemDeletedEvent, E}]
 	end.
 
-apply(journalItemCreatedEvent, J=#journalItemCreatedEvent{blocked=B}, State=#state{}) ->
+apply(journalItemCreatedEvent, #journalItemCreatedEvent{blocked=B}, State=#state{}) ->
 	State#state{blocked=B};
 apply(_, _, State=#state{}) ->
 	State.

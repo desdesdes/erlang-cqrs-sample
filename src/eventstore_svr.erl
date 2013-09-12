@@ -2,7 +2,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/0, store/2, retrieve/1]).
+-export([start_link/0, storeNew/2, storeAdd/2, retrieve/1]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
@@ -12,8 +12,11 @@ start_link() ->
 	{_,Pid} = gen_server:start_link(?MODULE, [], []),
 	register(?MODULE, Pid).
 
-store(Id, Events) ->
-	gen_server:call(?MODULE, {store, Id, Events}).
+storeNew(Id, Events) ->
+	gen_server:call(?MODULE, {storeNew, Id, Events}).
+
+storeAdd(Id, Events) ->
+	gen_server:call(?MODULE, {storeAdd, Id, Events}).
 
 retrieve(Id) ->
 	gen_server:call(?MODULE, {retrieve, Id}).
@@ -22,8 +25,11 @@ retrieve(Id) ->
 init([]) -> 	
 	{ok, orddict:new()}. % init state
 
-handle_call({store, Id, Events}, _From, State) ->
-	NewState = addEvents(Id, Events, State),
+handle_call({storeAdd, Id, Events}, _From, State) ->
+	NewState = addEventsToExisting(Id, Events, State),
+	{reply, ok, NewState};
+handle_call({storeNew, Id, Events}, _From, State) ->
+	NewState = addEventsToNew(Id, Events, State),
 	{reply, ok, NewState};
 handle_call( {retrieve, Id}, _From, State) ->
     {reply, getEvents(Id, State), State};
@@ -47,13 +53,23 @@ code_change(_OldVsn, State, _Extra) ->
 	%% but will not be used. Only a version on the next
 	{ok, State}.
 
-addEvents(Id, Events, State) -> 
+addEventsToNew(Id, Events, State) -> 
+	case orddict:find(Id, State) of
+		{ok, CurrentEvents} ->
+			io:format("Unexpected addEventsToNew: ~p~n",[CurrentEvents]),
+			throw(commandException);
+		error ->
+			orddict:store(Id, Events, State)
+    end.
+
+addEventsToExisting(Id, Events, State) -> 
 	case orddict:find(Id, State) of
 		{ok, CurrentEvents} ->
 			NewEvents = CurrentEvents ++ Events,
 			orddict:store(Id, NewEvents, State);
 		error ->
-			orddict:store(Id, Events, State)
+			io:format("Unexpected addEventsToExisting: ~p~n",[Id]),
+			throw(commandException)
     end.
 
 getEvents(Id, State) -> 

@@ -1,0 +1,8 @@
+application:start(sasl).
+f().
+make:all([load]).
+rr(cqrs).
+cqrs:start().
+
+cqrs:dispatch(createJournalItemCommand, #createJournalItemCommand{journalItem="a", name="a", blocked=false}).
+cqrs:dispatch(deleteJournalItemCommand, #deleteJournalItemCommand{journalItem="a"}).
