@@ -6,7 +6,7 @@
 behaviour_info(callbacks) -> [{handle, 2}];
 behaviour_info(_) -> undefined.
 
-add(Aggregate, _Id, Command, CommandData) ->
+add(Aggregate, Id, Command, CommandData) ->
 	StartState = Aggregate:init(),
 	Events = Aggregate:do(Command, CommandData, StartState),
 
@@ -14,24 +14,28 @@ add(Aggregate, _Id, Command, CommandData) ->
 	_NewState = applyEvent(Aggregate, Events, StartState),
 	% new state could be stored to improve load performance
 
-	% store the new event
+	% store the new events
+	eventstore:store(Id, Events),
 
 	% push the event to the rest of the system
 	publishEvents(Events).
 
-single(Aggregate, _Id, Command, CommandData) -> 
+single(Aggregate, Id, Command, CommandData) -> 
 	StartState = Aggregate:init(),
 
-	% load all the events for the aggregate id and apply all of them
-	% LastGoodState = applyEvent(Aggregate, Events, undefined),
+	RetrievedEvents = eventstore:retrieve(Id),
 
-	Events = Aggregate:do(Command, CommandData, StartState),
+	% load all the events for the aggregate id and apply all of them
+	LastGoodState = applyEvent(Aggregate, RetrievedEvents, StartState),
+
+	Events = Aggregate:do(Command, CommandData, LastGoodState),
 
 	% apply the events to the aggregate
-	_NewState = applyEvent(Aggregate, Events, StartState),
+	_NewState = applyEvent(Aggregate, Events, LastGoodState),
 	% new state could be stored to improve load performance
 
-	% store the new event
+	% store the new events
+	eventstore:store(Id, Events),
 
 	% push the event to the rest of the system
 	publishEvents(Events).
@@ -40,8 +44,8 @@ applyEvent(_Aggregate, [], State) ->
 	State;
 applyEvent(Aggregate, [H|T], State) ->
 	{NewEvent, NewEventData} = H,
-	Aggregate:apply(NewEvent, NewEventData, State),
-	applyEvent(Aggregate, T, State).
+	NewState = Aggregate:apply(NewEvent, NewEventData, State),
+	applyEvent(Aggregate, T, NewState).
 
 publishEvents([]) ->
 	ok;

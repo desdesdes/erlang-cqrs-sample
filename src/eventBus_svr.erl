@@ -65,6 +65,5 @@ addDestination(CurrentDestinations, Event, EventHandler) ->
 callDestination([], _Event, _EventData) -> 
     ok;
 callDestination([EventHandler|T], Event, EventData) -> 
-	io:format("callDestination: ~p~n",[EventHandler]),
 	EventHandler:handle(Event, EventData),
 	callDestination(T, Event, EventData).

@@ -12,6 +12,7 @@
 init() -> #state{}.
 
 do(createJournalItemCommand, C=#createJournalItemCommand{}, _State=#state{}) ->
+	io:format("do: ~p~n",[C]),
 	E = #journalItemCreatedEvent{
 			journalItem=C#createJournalItemCommand.journalItem,
 			name=C#createJournalItemCommand.name,
@@ -25,15 +26,20 @@ do(createJournalItemCommand, C=#createJournalItemCommand{}, _State=#state{}) ->
 	    false -> [{journalItemCreatedEvent, E}]
 	end;
 do(deleteJournalItemCommand, C=#deleteJournalItemCommand{}, State=#state{}) ->
+	io:format("do: ~p~n",[C]),
 	E = #journalItemDeletedEvent{
-			journalItem=C#createJournalItemCommand.journalItem},
+			journalItem=C#deleteJournalItemCommand.journalItem},
 
 	case State#state.blocked of
 		true -> throw(commandException); %can i add extra info to the throw?
 	    false -> [{journalItemDeletedEvent, E}]
 	end.
 
-apply(journalItemCreatedEvent, #journalItemCreatedEvent{blocked=B}, State=#state{}) ->
-	State#state{blocked=B};
+apply(journalItemCreatedEvent, J=#journalItemCreatedEvent{blocked=B}, State=#state{}) ->
+	io:format("apply: ~p~n",[J]),
+	NewState = State#state{blocked=B},
+	io:format("apply state: ~p~n",[NewState]),
+	NewState;
 apply(_, _, State=#state{}) ->
+	io:format("apply state: ~p~n",[State]),
 	State.

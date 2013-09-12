@@ -4,6 +4,7 @@
 -compile(export_all).
 
 start() ->
+	eventstore:start_link(),
 	eventBus:start_link(),
 	eventBus:registerHandler(journalItemCreatedEvent, journalItemQueryModelBuilder),
 	eventBus:registerHandler(journalItemDeletedEvent, journalItemQueryModelBuilder),

@@ -8,10 +8,10 @@
 -export([handle/2]).
 
 handle(journalItemCreatedEvent, E=#journalItemCreatedEvent{}) -> 
-	io:format("journalItemQueryModelBuilder journalItemCreatedEvent: ~p~n",[E]),
+	io:format("journalItemQueryModelBuilder: ~p~n",[E]),
 	% write to db
 	ok;
 handle(journalItemDeletedEvent, E=#journalItemDeletedEvent{}) -> 
-	io:format("journalItemQueryModelBuilder journalItemDeletedEvent: ~p~n",[E]),
+	io:format("journalItemQueryModelBuilder: ~p~n",[E]),
 	% remove from DB
 	ok.
