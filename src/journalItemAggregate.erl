@@ -21,8 +21,9 @@ do(createJournalItemCommand, C=#createJournalItemCommand{}, _State=#state{}) ->
 			blocked=C#createJournalItemCommand.blocked,
 			deadline=C#createJournalItemCommand.deadline},
 
+	% check:all items should have a name
 	case C#createJournalItemCommand.name == [] of
-		true -> throw(commandException); %can i add extra info to the throw?
+		true -> throw(commandException); %can / should we add extra info to the throw?
 	    false -> [{journalItemCreatedEvent, E}]
 	end;
 do(deleteJournalItemCommand, C=#deleteJournalItemCommand{}, State=#state{}) ->
@@ -30,16 +31,13 @@ do(deleteJournalItemCommand, C=#deleteJournalItemCommand{}, State=#state{}) ->
 	E = #journalItemDeletedEvent{
 			journalItem=C#deleteJournalItemCommand.journalItem},
 
+	% check: blocked items cannot be deleted
 	case State#state.blocked of
-		true -> throw(commandException); %can i add extra info to the throw?
+		true -> throw(commandException); %can / should we add extra info to the throw?
 	    false -> [{journalItemDeletedEvent, E}]
 	end.
 
 apply(journalItemCreatedEvent, J=#journalItemCreatedEvent{blocked=B}, State=#state{}) ->
-	io:format("apply: ~p~n",[J]),
-	NewState = State#state{blocked=B},
-	io:format("apply state: ~p~n",[NewState]),
-	NewState;
+	State#state{blocked=B};
 apply(_, _, State=#state{}) ->
-	io:format("apply state: ~p~n",[State]),
 	State.
